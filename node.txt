@@ -1,0 +1,10 @@
++-- @discordjs/opus@0.3.3
++-- cheerio@1.0.0-rc.3
++-- discord.js@12.4.0
++-- ffmpeg@0.0.4
++-- ffmpeg-static@4.2.7
++-- node-cmd@3.0.0
++-- node-fetch@2.6.1
++-- request@2.88.2
++-- request-promise@4.2.6
+`-- ytdl-core@3.4.2
