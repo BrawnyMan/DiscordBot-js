@@ -1,4 +1,5 @@
 const { prefix } = require("../config.json");
+const { curr_time } = require("../util/curr_time.js");
 module.exports = {
   name: "poll",
   usage: "poll < question >",
@@ -17,7 +18,15 @@ module.exports = {
         sent
           .react("✅")
           .then(() => sent.react("❌"))
-          .catch(() => console.error("One of the emojis failed to react."));
+          .catch(() =>
+            message.client.users.cache
+              .get("<your_ID>")
+              .send(
+                `[${curr_time()}] ${message.author} (${
+                  message.content
+                }) ${error}`
+              )
+          );
       });
   },
 };
