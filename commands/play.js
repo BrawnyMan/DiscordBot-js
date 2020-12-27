@@ -1,4 +1,5 @@
 const { /*Util,*/ MessageEmbed } = require("discord.js");
+const { curr_time } = require("../util/curr_time.js");
 //const { getTime } = require('../util/getTime');
 //const ytdl = require('ytdl-core');
 const fs = require("fs");
@@ -7,7 +8,7 @@ module.exports = {
   usage: "play < nameOfVoice >",
   description: "Sing a song in your voice channel",
   args: true,
-  cooldown: 0.5,
+  cooldown: 5,
   async execute(message) {
     try {
       const args = message.content.split(/ +/);
@@ -22,7 +23,7 @@ module.exports = {
       let song = {
         title: args[0],
         url: "./music_file/" + args[0] + ".mp3",
-        /*yt: false,*/ len: 0,
+        /*yt: false, len: 0,*/
       };
       if (!fs.existsSync(song.url))
         return message.channel.send("This song does not exists!");
@@ -33,20 +34,17 @@ module.exports = {
           connection: null,
           songs: [],
           volume: 0.5,
-          len: 0,
           loop: 0,
           playing: true,
         };
         queue.set(message.guild.id, queueContruct);
         queueContruct.songs.push(song);
-        queueContruct.len += parseInt(song.len);
         try {
           let connection = await voiceChannel.join();
           queueContruct.connection = connection;
           //queueContruct.textChannel.send(`🎶 Playing: **${song.title}**`);
           this.play(message, queueContruct.songs[0]);
         } catch (err) {
-          console.log(err);
           queue.delete(message.guild.id);
           return message.channel.send(err);
         }
@@ -56,21 +54,19 @@ module.exports = {
             "Cannot add more than 100 songs to queue!"
           );
         serverQueue.songs.push(song);
-        const ifList = song.yt ? `${song.title}` : `${song.title}`;
+        //const ifList = song.yt ? `${song.title}` : `${song.title}`; There should be YT music title if YT is selected
         const embed = new MessageEmbed()
           .setAuthor(
             "Added to queue",
             `${message.author.displayAvatarURL({ dynamic: true })}`
           )
-          .setTitle(`${ifList}`)
+          .setTitle(`${song.title}`)
           /*.addFields( { name: 'Time until playing (YT only)', value: `${getTime(parseInt(serverQueue.len))}`, inline: true },
                                 { name: 'Postition in queue', value: `\`${serverQueue.songs.length}\``, inline: true } );*/
           .setDescription(`Postition in queue \`${serverQueue.songs.length}\``);
-        serverQueue.len += parseInt(song.len);
         return message.channel.send(embed);
       }
     } catch (error) {
-      console.log(error);
       message.channel.send(error.message);
     }
   },
@@ -79,7 +75,6 @@ module.exports = {
     const queue = message.client.queue;
     const serverQueue = queue.get(message.guild.id);
     if (!song) {
-      time = 0;
       queue.delete(message.guild.id);
       return;
     }
@@ -89,12 +84,17 @@ module.exports = {
     dispatcher = serverQueue.connection.play(song.url);
     dispatcher
       .on("finish", () => {
-        serverQueue.len -= parseInt(song.len);
-        // if looop no shift
+        // if loop no shift
         if (serverQueue.loop == 0) serverQueue.songs.shift();
         this.play(message, serverQueue.songs[0]);
       })
-      .on("error", (error) => console.error(error));
+      .on("error", (error) =>
+        message.client.users.cache
+          .get("<your_ID>")
+          .send(
+            `[${curr_time()}] ${message.author} (${message.content}) ${error}`
+          )
+      );
     dispatcher.setVolumeLogarithmic(serverQueue.volume / 1);
   },
 };
