@@ -80,7 +80,9 @@ client.on("message", (message) => {
     // Will print the error in console
     console.error(error);
     // Will send the error to you in DM's
-    client.users.cache.get("<your_ID>").send(error);
+    message.client.users.cache
+      .get("<your_ID>")
+      .send(`[${curr_time()}] ${message.author} (${message.content}) ${error}`);
   }
 });
 
