@@ -77,7 +77,10 @@ client.on("message", (message) => {
   try {
     command.execute(message);
   } catch (error) {
+    // Will print the error in console
     console.error(error);
+    // Will send the error to you in DM's
+    client.users.cache.get("<your_ID>").send(error);
   }
 });
 
