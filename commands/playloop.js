@@ -1,11 +1,12 @@
 const { MessageEmbed } = require("discord.js");
+const { curr_time } = require("../util/curr_time.js");
 const fs = require("fs");
 module.exports = {
   name: "playloop",
   usage: "playloop < nameOfVoice >",
   description: "Loops a song in your voice channel",
   args: true,
-  cooldown: 1,
+  cooldown: 5,
   async execute(message) {
     try {
       const args = message.content.split(/ +/);
@@ -20,7 +21,6 @@ module.exports = {
       let song = {
         title: args[0],
         url: "./music_file/" + args[0] + ".mp3",
-        len: 0,
       };
       if (!fs.existsSync(song.url))
         return message.channel.send("This song does not exists!");
@@ -31,19 +31,16 @@ module.exports = {
           connection: null,
           songs: [],
           volume: 0.5,
-          len: 0,
           loop: 1,
           playing: true,
         };
         queue.set(message.guild.id, queueContruct);
         queueContruct.songs.push(song);
-        queueContruct.len += parseInt(song.len);
         try {
           let connection = await voiceChannel.join();
           queueContruct.connection = connection;
           this.play(message, queueContruct.songs[0]);
         } catch (err) {
-          console.log(err);
           queue.delete(message.guild.id);
           return message.channel.send(err);
         }
@@ -53,20 +50,17 @@ module.exports = {
             "Cannot add more than 100 songs to queue!"
           );
         serverQueue.songs.push(song);
-        const ifList = song.yt ? `${song.title}` : `${song.title}`;
         const embed = new MessageEmbed()
           .setAuthor(
             "Added to queue",
             `${message.author.displayAvatarURL({ dynamic: true })}`
           )
-          .setTitle(`${ifList}`)
+          .setTitle(`${song.title}`)
           .setDescription(`Postition in queue \`${serverQueue.songs.length}\``);
-        serverQueue.len += parseInt(song.len);
         serverQueue.loop = 1;
         return message.channel.send(embed);
       }
     } catch (error) {
-      console.log(error);
       message.channel.send(error.message);
     }
   },
@@ -75,19 +69,23 @@ module.exports = {
     const queue = message.client.queue;
     const serverQueue = queue.get(message.guild.id);
     if (!song) {
-      time = 0;
       queue.delete(message.guild.id);
       return;
     }
     dispatcher = serverQueue.connection.play(song.url);
     dispatcher
       .on("finish", () => {
-        serverQueue.len -= parseInt(song.len);
-        // if looop no shift
+        // if loop no shift
         if (serverQueue.loop == 0) serverQueue.songs.shift();
         this.play(message, serverQueue.songs[0]);
       })
-      .on("error", (error) => console.error(error));
+      .on("error", (error) =>
+        message.client.users.cache
+          .get("345972187007680533")
+          .send(
+            `[${curr_time()}] ${message.author} (${message.content}) ${error}`
+          )
+      );
     dispatcher.setVolumeLogarithmic(serverQueue.volume / 1);
   },
 };
