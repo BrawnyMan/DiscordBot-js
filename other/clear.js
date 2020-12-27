@@ -10,7 +10,7 @@ module.exports = (message) => {
     return message.reply("you need to input a number between 1 and 99.");
   message.channel.bulkDelete(amount, true).catch((err) => {
     message.client.users.cache
-      .get("345972187007680533")
+      .get("<your_ID>")
       .send(`[${curr_time()}] ${message.author} (${message.content}) ${err}`);
     message.channel.send(
       "there was an error trying to prune messages in this channel!"
