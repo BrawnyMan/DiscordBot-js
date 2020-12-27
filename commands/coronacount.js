@@ -1,4 +1,5 @@
 const { MessageEmbed } = require("discord.js");
+const { curr_time } = require("../util/curr_time.js");
 const rp = require("request-promise");
 const $ = require("cheerio");
 const url = "https://www.worldometers.info/coronavirus/";
@@ -48,7 +49,11 @@ module.exports = {
         message.channel.send(embed);
       })
       .catch(function (err) {
-        console.log(err); //handle error
+        message.client.users.cache
+          .get("<your_ID>")
+          .send(
+            `[${curr_time()}] ${message.author} (${message.content}) ${err}`
+          );
       });
   },
 };
