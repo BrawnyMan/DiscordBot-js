@@ -1,6 +1,7 @@
 // Everything the bot requires
 const { prefix, token } = require("./config.json");
 const { Collection } = require("discord.js");
+const { curr_time } = require("./util/curr_time.js");
 const MakeClient = require("./util/Client");
 const { readdirSync } = require("fs");
 
