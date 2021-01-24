@@ -1,60 +1,61 @@
-// Everything the bot requires
 const { prefix, token } = require("./config.json");
 const { Collection } = require("discord.js");
-const { curr_time } = require("./util/curr_time.js");
 const MakeClient = require("./util/Client");
+const { curr_time } = require("./util/curr_time.js");
 const { readdirSync } = require("fs");
-
-// Special command
 let clr = require("./other/clear.js");
-
-// Create bot/client
+let rld = require("./other/reload.js");
 const client = new MakeClient();
 
-// Find all files in ./commands that ends with .js
+// Gets all command names
 const commandFile = readdirSync("./commands").filter((file) =>
   file.endsWith(".js")
 );
-
-// Sets all commands from ./commands folder
+// Sets all commands
 for (const file of commandFile) {
   const command = require(`./commands/${file}`);
   client.commands.set(command.name, command);
 }
 
-// When bot/client is ready
+// What will bot do when it starts
 client.on("ready", () => {
   console.log("Ready to work hard!");
   client.user.setActivity("YT", { type: "WATCHING" });
 });
 
-// When bot/client recieves the message
+// What will bot do when it receives message
 client.on("message", (message) => {
+  // Check if the message starts with correct characters / prefix
   if (!message.content.startsWith(prefix) || message.author.bot) return;
-  // Only you can execute this command
-  if (message.author.id == "<your_ID>") {
+  //--------------------------------------------------------------------
+  // Commands only id_user can run
+  if (message.author.id == "<your_id>") {
+    // Command that kill / shutdowns the bot
     if (message.content == `${prefix}kill`)
       process.kill(process.pid, "SIGTERM");
-    // Shuts down the bot
-    else if (message.content.startsWith(`${prefix}clear`)) clr(message); // Clear messages for you
+    // Clear command
+    else if (message.content.startsWith(`${prefix}clear`)) clr(message);
+    // Reaload command
+    else if (message.content.startsWith(`${prefix}reload`)) rld(message);
   }
+  //--------------------------------------------------------------------
   const args = message.content.slice(prefix.length).split(/ +/);
-  const commandName = args.shift().toLowerCase(); // All commands are turned to lowercase
-  // Find command or searche it under it's aliases
+  const commandName = args.shift().toLowerCase();
+  // Find command
   const command =
     client.commands.get(commandName) ||
     client.commands.find(
       (cmd) => cmd.aliases && cmd.aliases.includes(commandName)
     );
   if (!command) return;
+  // Check proper use of command
   if (command.args && !args.length) {
-    // If there is no argument but it should be
     let reply = `You didn't provide any arguments, ${message.author}!`;
     if (command.usage)
       reply += `\nThe proper usage would be: \`${prefix}${command.name} ${command.usage}\``;
     return message.channel.send(reply);
   }
-  // Cooldown for commands
+  // Checks or makes a cooldown for all commands
   if (!client.cooldowns.has(command.name))
     client.cooldowns.set(command.name, new Collection());
   if (message.channel.type !== "text")
@@ -76,15 +77,14 @@ client.on("message", (message) => {
   timestamps.set(message.author.id, now);
   setTimeout(() => timestamps.delete(message.author.id), cooldownAmount);
   try {
+    // Execute command
     command.execute(message);
   } catch (error) {
-    // Will print the error in console
-    console.error(error);
-    // Will send the error to you in DM's
     message.client.users.cache
-      .get("<your_ID>")
+      .get("<your_id>")
       .send(`[${curr_time()}] ${message.author} (${message.content}) ${error}`);
   }
 });
 
+// Login bot
 client.login(token);
