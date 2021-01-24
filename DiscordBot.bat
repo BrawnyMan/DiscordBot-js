@@ -14,8 +14,7 @@ goto TEST
 
 :RUN
 D:
-cd D:\<your_path>
-color 0B
+cd <path_to_bot>
 cls
 node .
 pause
