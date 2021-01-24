@@ -1,7 +1,7 @@
-// Command that clears messages
 const { prefix } = require("../config.json");
 const { curr_time } = require("../util/curr_time.js");
 module.exports = (message) => {
+  // Deletes messages (any kind)
   const args = message.content.slice(prefix.length).split(/ +/);
   const amount = parseInt(args[1]) + 1;
   if (isNaN(amount))
@@ -10,7 +10,7 @@ module.exports = (message) => {
     return message.reply("you need to input a number between 1 and 99.");
   message.channel.bulkDelete(amount, true).catch((err) => {
     message.client.users.cache
-      .get("<your_ID>")
+      .get("<your_id>")
       .send(`[${curr_time()}] ${message.author} (${message.content}) ${err}`);
     message.channel.send(
       "there was an error trying to prune messages in this channel!"
