@@ -3,7 +3,7 @@ module.exports = {
   name: "cat",
   usage: "cat",
   description: "Display a cat",
-  cooldown: 5,
+  // Gets url of image or .gif of random cat
   async execute(message) {
     const { file } = await fetch(
       "https://aws.random.cat/meow"
