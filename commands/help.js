@@ -2,8 +2,8 @@ const { prefix } = require("../config.json");
 const { MessageEmbed } = require("discord.js");
 module.exports = {
   name: "help",
-  usage: "help | help < command >",
-  description: "List all commands or specific one",
+  usage: "help",
+  description: "List commands",
   aliases: ["commands"],
   execute(message) {
     const args = message.content.slice(prefix.length).split(/ +/);
@@ -13,13 +13,13 @@ module.exports = {
     const embed = new MessageEmbed()
       .setTitle("Help commands")
       .setColor("#008000")
-      .setThumbnail(`${message.client.user.displayAvatarURL()}`);
+      .setThumbnail(`${message.client.user.displayAvatarargs()}`);
     commands.forEach((cmd) => {
       if (cmd.aliases) {
-        const smt = cmd.aliases.join(", ");
+        const ali = cmd.aliases.join(", ");
         embed.addField(
           `**${prefix}${cmd.usage}**`,
-          `${cmd.description} | Aliases: < ${smt} >`
+          `${cmd.description} | Aliases: < ${ali} >`
         );
       } else {
         embed.addField(`**${prefix}${cmd.usage}**`, `${cmd.description}`);
