@@ -3,7 +3,9 @@ module.exports = {
   name: "loop",
   usage: "loop",
   description: "Loops the song",
+  aliases: ["repeat"],
   execute(message) {
+    // Getting queue and changing property for looping
     const queue = message.client.queue;
     const serverQueue = queue.get(message.guild.id);
     if (serverQueue) {
