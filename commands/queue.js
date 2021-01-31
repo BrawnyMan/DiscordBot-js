@@ -11,12 +11,11 @@ module.exports = {
     if (!serverQueue) return message.channel.send("There is nothing playing.");
     let links = "";
     const embed = new MessageEmbed();
+    // Show first 10 voices on queue
     for (let i = 1; i < 10; i++) {
       let s = serverQueue.songs[i];
       if (!s) break;
-      if (s.yt)
-        links += `\`${i}.\` [${s.title}](${s.url}) \| \`${getTime(s.len)}\`\n`;
-      else links += `\`${i}.\` ${s.title} \| \`list\`\n`;
+      links += `\`${i}.\` ${s.title}\n`;
     }
     embed.setTitle("Queue").setDescription(links);
     return message.channel.send(embed);
