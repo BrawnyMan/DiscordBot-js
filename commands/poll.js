@@ -20,7 +20,7 @@ module.exports = {
           .then(() => sent.react("❌"))
           .catch(() =>
             message.client.users.cache
-              .get("<your_ID>")
+              .get("<your_id>")
               .send(
                 `[${curr_time()}] ${message.author} (${
                   message.content
