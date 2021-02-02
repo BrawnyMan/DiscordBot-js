@@ -2,7 +2,6 @@ module.exports = {
   name: "resume",
   usage: "resume",
   description: "Resume the song",
-  cooldown: 5,
   aliases: ["r"],
   execute(message) {
     const serverQueue = message.client.queue.get(message.guild.id);
