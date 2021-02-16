@@ -86,5 +86,16 @@ client.on("message", (message) => {
   }
 });
 
+// Leaves voice channel if there is no body inside for 5 minutes
+client.on("voiceStateUpdate", (oldState, newState) => {
+  if (oldState.channelID !== oldState.guild.me.voice.channelID) {
+    return;
+  }
+  if (!oldState.channel.members.size - 1)
+    setTimeout(() => {
+      oldState.channel.leave();
+    }, 5 * 60 * 1000);
+});
+
 // Login bot
 client.login(token);
